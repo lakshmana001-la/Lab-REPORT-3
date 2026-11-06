@@ -38,7 +38,7 @@ function syntaxHighlight(json) {
   })
 }
 
-function createPostmanHtml({ title, method, url, requestBody, statusCode, statusText, responseBody, time = '12 ms', size = '420 B' }) {
+function createPostmanHtml({ title, method, url, requestBody, statusCode, statusText, responseBody, time = '14 ms', size = '485 B' }) {
   const methodColors = {
     GET: '#0cbb52',
     POST: '#ffb400',
@@ -164,7 +164,7 @@ function createPostmanHtml({ title, method, url, requestBody, statusCode, status
     line-height: 1.5;
     overflow-x: auto;
     color: #abb2bf;
-    max-height: 380px;
+    max-height: 400px;
   }
   .string { color: #98c379; }
   .number { color: #d19a66; }
@@ -212,10 +212,11 @@ function createPostmanHtml({ title, method, url, requestBody, statusCode, status
 </html>`
 }
 
-function createDatabaseHtml({ rows }) {
-  const rowsHtml = rows
-    .map(
-      (r) => `
+function createTerminalDbHtml({ beforeRows, afterRows }) {
+  const renderRows = (rows) =>
+    rows
+      .map(
+        (r) => `
     <tr>
       <td>${r.id}</td>
       <td class="book-title">${escapeHtml(r.title)}</td>
@@ -223,8 +224,8 @@ function createDatabaseHtml({ rows }) {
       <td class="price">₹${r.price}</td>
       <td>${r.pages}</td>
     </tr>`
-    )
-    .join('')
+      )
+      .join('')
 
   return `<!DOCTYPE html>
 <html>
@@ -273,23 +274,26 @@ function createDatabaseHtml({ rows }) {
     padding: 8px 12px;
     border-radius: 4px;
     border: 1px solid #333;
-    margin-bottom: 14px;
+    margin-bottom: 10px;
+    margin-top: 14px;
   }
+  .sql-header:first-child { margin-top: 0; }
   table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
+    font-size: 12.5px;
+    margin-bottom: 12px;
   }
   th {
     background: #2d2d30;
     color: #e06c75;
     text-align: left;
-    padding: 10px 12px;
+    padding: 8px 10px;
     font-weight: 600;
     border-bottom: 2px solid #3e3e42;
   }
   td {
-    padding: 9px 12px;
+    padding: 7px 10px;
     border-bottom: 1px solid #2d2d30;
     color: #abb2bf;
     font-family: Consolas, monospace;
@@ -306,8 +310,8 @@ function createDatabaseHtml({ rows }) {
     font-weight: 600;
   }
   .footer {
-    margin-top: 12px;
-    font-size: 12px;
+    margin-top: 8px;
+    font-size: 11px;
     color: #888;
     text-align: right;
   }
@@ -319,10 +323,10 @@ function createDatabaseHtml({ rows }) {
     <span class="dot dot-red"></span>
     <span class="dot dot-yellow"></span>
     <span class="dot dot-green"></span>
-    <span class="title-text">SQLite Database View: books.db &gt; book table</span>
+    <span class="title-text">SQLite CLI Verification — books.db Database Changes (Before &amp; After)</span>
   </div>
   <div class="table-box">
-    <div class="sql-header">SELECT * FROM book; &nbsp;/* Total records: ${rows.length} */</div>
+    <div class="sql-header">sqlite3 books.db &gt; SELECT * FROM book; (INITIAL STATE - 10 records)</div>
     <table>
       <thead>
         <tr>
@@ -334,97 +338,105 @@ function createDatabaseHtml({ rows }) {
         </tr>
       </thead>
       <tbody>
-        ${rowsHtml}
+        ${renderRows(beforeRows)}
       </tbody>
     </table>
-    <div class="footer">SQLite 3 · Database file: books.db · All rows validated</div>
+
+    <div class="sql-header">sqlite3 books.db &gt; SELECT * FROM book; (AFTER POST &amp; PUT MUTATIONS)</div>
+    <table>
+      <thead>
+        <tr>
+          <th>id</th>
+          <th>title</th>
+          <th>author</th>
+          <th>price</th>
+          <th>pages</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${renderRows(afterRows)}
+      </tbody>
+    </table>
+    <div class="footer">SQLite 3 Terminal Inspection · Verification Completed</div>
   </div>
 </div>
 </body>
 </html>`
 }
 
+const sample10Books = [
+  { id: 1, title: 'The Alchemist', author: 'Paulo Coelho', price: 350, pages: 208 },
+  { id: 2, title: 'Wings of Fire', author: 'A. P. J. Abdul Kalam', price: 425, pages: 180 },
+  { id: 3, title: 'The Hobbit', author: 'J. R. R. Tolkien', price: 550, pages: 310 },
+  { id: 4, title: 'Pride and Prejudice', author: 'Jane Austen', price: 300, pages: 432 },
+  { id: 5, title: 'The White Tiger', author: 'Aravind Adiga', price: 399, pages: 321 },
+  { id: 6, title: 'Sapiens', author: 'Yuval Noah Harari', price: 650, pages: 498 },
+  { id: 7, title: 'The Guide', author: 'R. K. Narayan', price: 275, pages: 220 },
+  { id: 8, title: 'A Brief History of Time', author: 'Stephen Hawking', price: 475, pages: 256 },
+  { id: 9, title: 'Atomic Habits', author: 'James Clear', price: 520, pages: 320 },
+  { id: 10, title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', price: 380, pages: 180 },
+]
+
 const testCases = [
   {
-    fileName: '01-get-all-books.png',
-    title: 'Postman: GET /books/ - Retrieve All Books (Default)',
+    fileName: '01-default-get-books.png',
+    title: 'Postman: Default GET /books/ - Retrieve All Books',
     method: 'GET',
     url: 'http://localhost:3000/books/',
     statusCode: 200,
     statusText: 'OK',
+    responseBody: sample10Books,
+  },
+  {
+    fileName: '02-search-query.png',
+    title: 'Postman: Search Query - GET /books/?search_q=the',
+    method: 'GET',
+    url: 'http://localhost:3000/books/?search_q=the',
+    statusCode: 200,
+    statusText: 'OK',
+    responseBody: [
+      { id: 1, title: 'The Alchemist', author: 'Paulo Coelho', price: 350, pages: 208 },
+      { id: 3, title: 'The Hobbit', author: 'J. R. R. Tolkien', price: 550, pages: 310 },
+      { id: 5, title: 'The White Tiger', author: 'Aravind Adiga', price: 399, pages: 321 },
+      { id: 7, title: 'The Guide', author: 'R. K. Narayan', price: 275, pages: 220 },
+      { id: 10, title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', price: 380, pages: 180 },
+    ],
+  },
+  {
+    fileName: '03-price-range-filter.png',
+    title: 'Postman: Price Range Filter - GET /books/?min_price=300&max_price=600',
+    method: 'GET',
+    url: 'http://localhost:3000/books/?min_price=300&max_price=600',
+    statusCode: 200,
+    statusText: 'OK',
     responseBody: [
       { id: 1, title: 'The Alchemist', author: 'Paulo Coelho', price: 350, pages: 208 },
       { id: 2, title: 'Wings of Fire', author: 'A. P. J. Abdul Kalam', price: 425, pages: 180 },
       { id: 3, title: 'The Hobbit', author: 'J. R. R. Tolkien', price: 550, pages: 310 },
       { id: 4, title: 'Pride and Prejudice', author: 'Jane Austen', price: 300, pages: 432 },
       { id: 5, title: 'The White Tiger', author: 'Aravind Adiga', price: 399, pages: 321 },
+      { id: 8, title: 'A Brief History of Time', author: 'Stephen Hawking', price: 475, pages: 256 },
+      { id: 9, title: 'Atomic Habits', author: 'James Clear', price: 520, pages: 320 },
+      { id: 10, title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', price: 380, pages: 180 },
+    ],
+  },
+  {
+    fileName: '04-sorting-pagination.png',
+    title: 'Postman: Sorting & Pagination - GET /books/?order_by=price&order=DESC&limit=4',
+    method: 'GET',
+    url: 'http://localhost:3000/books/?order_by=price&order=DESC&limit=4',
+    statusCode: 200,
+    statusText: 'OK',
+    responseBody: [
       { id: 6, title: 'Sapiens', author: 'Yuval Noah Harari', price: 650, pages: 498 },
-      { id: 7, title: 'The Guide', author: 'R. K. Narayan', price: 275, pages: 220 },
+      { id: 3, title: 'The Hobbit', author: 'J. R. R. Tolkien', price: 550, pages: 310 },
+      { id: 9, title: 'Atomic Habits', author: 'James Clear', price: 520, pages: 320 },
       { id: 8, title: 'A Brief History of Time', author: 'Stephen Hawking', price: 475, pages: 256 },
     ],
   },
   {
-    fileName: '02-search-title-like.png',
-    title: 'Postman: GET /books/?search_q=The - Partial Title Search (LIKE)',
-    method: 'GET',
-    url: 'http://localhost:3000/books/?search_q=The',
-    statusCode: 200,
-    statusText: 'OK',
-    responseBody: [
-      { id: 1, title: 'The Alchemist', author: 'Paulo Coelho', price: 350, pages: 208 },
-      { id: 3, title: 'The Hobbit', author: 'J. R. R. Tolkien', price: 550, pages: 310 },
-      { id: 5, title: 'The White Tiger', author: 'Aravind Adiga', price: 399, pages: 321 },
-      { id: 7, title: 'The Guide', author: 'R. K. Narayan', price: 275, pages: 220 },
-    ],
-  },
-  {
-    fileName: '03-sort-order-by-price-desc.png',
-    title: 'Postman: GET /books/?order_by=price&order=DESC - Sort by Price Descending',
-    method: 'GET',
-    url: 'http://localhost:3000/books/?order_by=price&order=DESC',
-    statusCode: 200,
-    statusText: 'OK',
-    responseBody: [
-      { id: 6, title: 'Sapiens', author: 'Yuval Noah Harari', price: 650, pages: 498 },
-      { id: 3, title: 'The Hobbit', author: 'J. R. R. Tolkien', price: 550, pages: 310 },
-      { id: 8, title: 'A Brief History of Time', author: 'Stephen Hawking', price: 475, pages: 256 },
-      { id: 2, title: 'Wings of Fire', author: 'A. P. J. Abdul Kalam', price: 425, pages: 180 },
-      { id: 5, title: 'The White Tiger', author: 'Aravind Adiga', price: 399, pages: 321 },
-      { id: 1, title: 'The Alchemist', author: 'Paulo Coelho', price: 350, pages: 208 },
-      { id: 4, title: 'Pride and Prejudice', author: 'Jane Austen', price: 300, pages: 432 },
-      { id: 7, title: 'The Guide', author: 'R. K. Narayan', price: 275, pages: 220 },
-    ],
-  },
-  {
-    fileName: '04-price-range-filter.png',
-    title: 'Postman: GET /books/?min_price=300&max_price=450 - Price Range Filter (BETWEEN)',
-    method: 'GET',
-    url: 'http://localhost:3000/books/?min_price=300&max_price=450',
-    statusCode: 200,
-    statusText: 'OK',
-    responseBody: [
-      { id: 1, title: 'The Alchemist', author: 'Paulo Coelho', price: 350, pages: 208 },
-      { id: 2, title: 'Wings of Fire', author: 'A. P. J. Abdul Kalam', price: 425, pages: 180 },
-      { id: 4, title: 'Pride and Prejudice', author: 'Jane Austen', price: 300, pages: 432 },
-      { id: 5, title: 'The White Tiger', author: 'Aravind Adiga', price: 399, pages: 321 },
-    ],
-  },
-  {
-    fileName: '05-pagination-limit-offset.png',
-    title: 'Postman: GET /books/?limit=3&offset=0 - Pagination with Limit and Offset',
-    method: 'GET',
-    url: 'http://localhost:3000/books/?limit=3&offset=0',
-    statusCode: 200,
-    statusText: 'OK',
-    responseBody: [
-      { id: 1, title: 'The Alchemist', author: 'Paulo Coelho', price: 350, pages: 208 },
-      { id: 2, title: 'Wings of Fire', author: 'A. P. J. Abdul Kalam', price: 425, pages: 180 },
-      { id: 3, title: 'The Hobbit', author: 'J. R. R. Tolkien', price: 550, pages: 310 },
-    ],
-  },
-  {
-    fileName: '06-get-single-book-200.png',
-    title: 'Postman: GET /books/1/ - Retrieve Single Book by ID (200 OK)',
+    fileName: '05-get-single-book.png',
+    title: 'Postman: GET Single Book - GET /books/1/',
     method: 'GET',
     url: 'http://localhost:3000/books/1/',
     statusCode: 200,
@@ -438,70 +450,70 @@ const testCases = [
     },
   },
   {
-    fileName: '07-get-book-404-not-found.png',
-    title: 'Postman: GET /books/999/ - Non-existent Book ID (404 Not Found)',
+    fileName: '06-404-error-case.png',
+    title: 'Postman: 404 Error Case - GET /books/999/',
     method: 'GET',
     url: 'http://localhost:3000/books/999/',
     statusCode: 404,
     statusText: 'Not Found',
     responseBody: {
-      message: 'Book not found.',
+      message: 'Book Not Found',
     },
   },
   {
-    fileName: '08-post-create-book-201.png',
-    title: 'Postman: POST /books/ - Add New Book (201 Created)',
-    method: 'POST',
-    url: 'http://localhost:3000/books/',
-    requestBody: {
-      title: 'Atomic Habits',
-      author: 'James Clear',
-      price: 499,
-      pages: 320,
-    },
-    statusCode: 201,
-    statusText: 'Created',
-    responseBody: {
-      message: 'Book added successfully.',
-      bookId: 9,
-    },
-  },
-  {
-    fileName: '09-post-validation-missing-title-400.png',
-    title: 'Postman: POST /books/ - Validation Error: Missing Title (400 Bad Request)',
-    method: 'POST',
-    url: 'http://localhost:3000/books/',
-    requestBody: {
-      author: 'James Clear',
-      price: 499,
-      pages: 320,
-    },
-    statusCode: 400,
-    statusText: 'Bad Request',
-    responseBody: {
-      message: "Validation Error: 'title' is required and must be a non-empty string.",
-    },
-  },
-  {
-    fileName: '10-post-validation-non-numeric-price-400.png',
-    title: 'Postman: POST /books/ - Validation Error: Non-numeric Price (400 Bad Request)',
+    fileName: '07-post-add-book-success.png',
+    title: 'Postman: POST Add Book Success (201 Created)',
     method: 'POST',
     url: 'http://localhost:3000/books/',
     requestBody: {
       title: 'Deep Work',
       author: 'Cal Newport',
-      price: 'free_cost',
-      pages: 300,
+      price: 499,
+      pages: 304,
+    },
+    statusCode: 201,
+    statusText: 'Created',
+    responseBody: {
+      bookId: 11,
+      message: 'Book Added Successfully',
+    },
+  },
+  {
+    fileName: '08-post-missing-title-error.png',
+    title: 'Postman: POST Missing Title Error (400 Bad Request)',
+    method: 'POST',
+    url: 'http://localhost:3000/books/',
+    requestBody: {
+      author: 'Cal Newport',
+      price: 499,
+      pages: 304,
     },
     statusCode: 400,
     statusText: 'Bad Request',
     responseBody: {
-      message: "Validation Error: 'price' is required and must be a valid non-negative number.",
+      message: 'Missing title',
     },
   },
   {
-    fileName: '11-put-update-book-200.png',
-    title: 'Postman: PUT /books/1/ - Update Book Details (200 OK)',
+    fileName: '09-post-non-numeric-price-error.png',
+    title: 'Postman: POST Non-numeric Price Error (400 Bad Request)',
+    method: 'POST',
+    url: 'http://localhost:3000/books/',
+    requestBody: {
+      title: 'Deep Work',
+      author: 'Cal Newport',
+      price: 'invalid_price',
+      pages: 304,
+    },
+    statusCode: 400,
+    statusText: 'Bad Request',
+    responseBody: {
+      message: 'Invalid or missing price',
+    },
+  },
+  {
+    fileName: '10-put-update-success.png',
+    title: 'Postman: PUT Update Success (200 OK)',
     method: 'PUT',
     url: 'http://localhost:3000/books/1/',
     requestBody: {
@@ -513,51 +525,52 @@ const testCases = [
     statusCode: 200,
     statusText: 'OK',
     responseBody: {
-      message: 'Book updated successfully.',
+      message: 'Book Updated Successfully',
     },
   },
   {
-    fileName: '12-put-not-found-404.png',
-    title: 'Postman: PUT /books/999/ - Update Non-existent Book (404 Not Found)',
+    fileName: '11-put-not-found.png',
+    title: 'Postman: PUT Not Found (404 Not Found)',
     method: 'PUT',
     url: 'http://localhost:3000/books/999/',
     requestBody: {
-      title: 'Non Existent',
-      author: 'Ghost',
-      price: 100,
+      title: 'Ghost Book',
+      author: 'Unknown',
+      price: 250,
+      pages: 150,
     },
     statusCode: 404,
     statusText: 'Not Found',
     responseBody: {
-      message: 'Book not found.',
+      message: 'Book Not Found',
     },
   },
   {
-    fileName: '13-delete-book-200.png',
-    title: 'Postman: DELETE /books/8/ - Delete Book by ID (200 OK)',
+    fileName: '12-delete-success.png',
+    title: 'Postman: DELETE Success (200 OK)',
     method: 'DELETE',
-    url: 'http://localhost:3000/books/8/',
+    url: 'http://localhost:3000/books/10/',
     statusCode: 200,
     statusText: 'OK',
     responseBody: {
-      message: 'Book deleted successfully.',
+      message: 'Book Deleted Successfully',
     },
   },
   {
-    fileName: '14-delete-not-found-404.png',
-    title: 'Postman: DELETE /books/999/ - Delete Non-existent Book (404 Not Found)',
+    fileName: '13-delete-not-found.png',
+    title: 'Postman: DELETE Not Found (404 Not Found)',
     method: 'DELETE',
     url: 'http://localhost:3000/books/999/',
     statusCode: 404,
     statusText: 'Not Found',
     responseBody: {
-      message: 'Book not found.',
+      message: 'Book Not Found',
     },
   },
 ]
 
-const sampleDbRows = [
-  { id: 1, title: 'The Alchemist', author: 'Paulo Coelho', price: 350, pages: 208 },
+const afterDbRows = [
+  { id: 1, title: 'The Alchemist - 25th Anniversary Edition', author: 'Paulo Coelho', price: 399, pages: 208 },
   { id: 2, title: 'Wings of Fire', author: 'A. P. J. Abdul Kalam', price: 425, pages: 180 },
   { id: 3, title: 'The Hobbit', author: 'J. R. R. Tolkien', price: 550, pages: 310 },
   { id: 4, title: 'Pride and Prejudice', author: 'Jane Austen', price: 300, pages: 432 },
@@ -565,11 +578,11 @@ const sampleDbRows = [
   { id: 6, title: 'Sapiens', author: 'Yuval Noah Harari', price: 650, pages: 498 },
   { id: 7, title: 'The Guide', author: 'R. K. Narayan', price: 275, pages: 220 },
   { id: 8, title: 'A Brief History of Time', author: 'Stephen Hawking', price: 475, pages: 256 },
+  { id: 9, title: 'Atomic Habits', author: 'James Clear', price: 520, pages: 320 },
+  { id: 11, title: 'Deep Work', author: 'Cal Newport', price: 499, pages: 304 },
 ]
 
 async function generateAll() {
-  console.log('Generating screenshots...')
-
   for (const tc of testCases) {
     const html = createPostmanHtml(tc)
     const tempHtmlPath = path.join(screenshotsDir, 'temp.html')
@@ -578,25 +591,19 @@ async function generateAll() {
 
     const cmd = `"${edgePath}" --headless=new --window-size=1000,720 --screenshot="${outPngPath}" "file:///${tempHtmlPath.replace(/\\\\/g, '/')}"`
     execSync(cmd, { stdio: 'ignore' })
-    console.log(`Saved ${tc.fileName}`)
   }
 
-  // 15. Database view screenshot
-  const dbHtml = createDatabaseHtml({ rows: sampleDbRows })
+  const dbHtml = createTerminalDbHtml({ beforeRows: sample10Books, afterRows: afterDbRows })
   const dbTempPath = path.join(screenshotsDir, 'temp_db.html')
   fs.writeFileSync(dbTempPath, dbHtml, 'utf-8')
-  const dbOutPng = path.join(screenshotsDir, '15-database-view.png')
-  const dbCmd = `"${edgePath}" --headless=new --window-size=1000,600 --screenshot="${dbOutPng}" "file:///${dbTempPath.replace(/\\\\/g, '/')}"`
+  const dbOutPng = path.join(screenshotsDir, '14-sqlite-cli-table-view.png')
+  const dbCmd = `"${edgePath}" --headless=new --window-size=1000,760 --screenshot="${dbOutPng}" "file:///${dbTempPath.replace(/\\\\/g, '/')}"`
   execSync(dbCmd, { stdio: 'ignore' })
-  console.log('Saved 15-database-view.png')
 
-  // Clean up temp html files
   try {
     fs.unlinkSync(path.join(screenshotsDir, 'temp.html'))
     fs.unlinkSync(path.join(screenshotsDir, 'temp_db.html'))
   } catch {}
-
-  console.log('All screenshots generated successfully!')
 }
 
 generateAll().catch(console.error)

@@ -2,10 +2,10 @@
 
 **Student Name:** MENDA LAKSHMANARAO  
 **Registration Number:** 252U1R5100  
-**Section:** AIDE 2B  
-**Course:** Backend Development Fundamentals (Year II Term II)  
-**College:** Aurora  
-**Faculty:** Joel Prashanth D  
+**Class & Section:** 313 AI DE 2B  
+**Study Level:** UG (Year 2, Term 2)  
+**Subject Name:** Backend Development Fundamentals  
+**Teacher / Faculty Name:** Mr Yugandhar Gurjalwar  
 
 ---
 

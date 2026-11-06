@@ -38,86 +38,65 @@ function request(method, path, body = null) {
 }
 
 async function runTests() {
-  console.log('--- STARTING COMPREHENSIVE LAB 3 API TESTS ---\n')
-
-  // 1. GET /books/ default
   let res = await request('GET', '/books/')
-  console.log('1. GET /books/ (Default list): Status', res.status, '| Count:', res.body.length)
+  console.log('GET /books/: Status', res.status, '| Count:', res.body.length)
 
-  // 2. GET /books/?search_q=The
-  res = await request('GET', '/books/?search_q=The')
-  console.log('2. GET /books/?search_q=The (Search): Status', res.status, '| Books:', res.body.map(b => b.title))
+  res = await request('GET', '/books/?search_q=the')
+  console.log('GET /books/?search_q=the: Status', res.status, '| Count:', res.body.length)
 
-  // 3. GET /books/?order_by=price&order=DESC
-  res = await request('GET', '/books/?order_by=price&order=DESC')
-  console.log('3. GET /books/?order_by=price&order=DESC (Sort DESC): Status', res.status, '| Top price:', res.body[0].price)
+  res = await request('GET', '/books/?order_by=price&order=DESC&limit=4')
+  console.log('GET /books/?order_by=price&order=DESC&limit=4: Status', res.status, '| Books:', res.body.map(b => b.title))
 
-  // 4. GET /books/?min_price=300&max_price=450
-  res = await request('GET', '/books/?min_price=300&max_price=450')
-  console.log('4. GET /books/?min_price=300&max_price=450 (Price Range): Status', res.status, '| Count:', res.body.length)
+  res = await request('GET', '/books/?min_price=300&max_price=600')
+  console.log('GET /books/?min_price=300&max_price=600: Status', res.status, '| Count:', res.body.length)
 
-  // 5. GET /books/?limit=2&offset=0
-  res = await request('GET', '/books/?limit=2&offset=0')
-  console.log('5. GET /books/?limit=2&offset=0 (Pagination): Status', res.status, '| Count:', res.body.length)
-
-  // 6. GET /books/1/
   res = await request('GET', '/books/1/')
-  console.log('6. GET /books/1/ (Single Book): Status', res.status, '| Title:', res.body.title)
+  console.log('GET /books/1/: Status', res.status, '| Title:', res.body.title)
 
-  // 7. GET /books/999/ (Not Found)
   res = await request('GET', '/books/999/')
-  console.log('7. GET /books/999/ (404 Test): Status', res.status, '| Message:', res.body.message)
+  console.log('GET /books/999/: Status', res.status, '| Message:', res.body.message)
 
-  // 8. POST /books/ (Create Success)
-  res = await request('POST', '/books/', {
-    title: 'Atomic Habits',
-    author: 'James Clear',
-    price: 499,
-    pages: 320,
-  })
-  console.log('8. POST /books/ (Create 201): Status', res.status, '| Body:', res.body)
-
-  // 9. POST /books/ (Validation Failure: Missing Title)
-  res = await request('POST', '/books/', {
-    author: 'James Clear',
-    price: 499,
-  })
-  console.log('9. POST /books/ (Missing Title 400): Status', res.status, '| Message:', res.body.message)
-
-  // 10. POST /books/ (Validation Failure: Non-numeric Price)
   res = await request('POST', '/books/', {
     title: 'Deep Work',
     author: 'Cal Newport',
-    price: 'not_a_number',
+    price: 499,
+    pages: 304,
   })
-  console.log('10. POST /books/ (Non-numeric Price 400): Status', res.status, '| Message:', res.body.message)
+  console.log('POST /books/: Status', res.status, '| Body:', res.body)
 
-  // 11. PUT /books/1/ (Update Success)
+  res = await request('POST', '/books/', {
+    author: 'Cal Newport',
+    price: 499,
+  })
+  console.log('POST missing title: Status', res.status, '| Message:', res.body.message)
+
+  res = await request('POST', '/books/', {
+    title: 'Deep Work',
+    author: 'Cal Newport',
+    price: 'invalid',
+  })
+  console.log('POST non-numeric price: Status', res.status, '| Message:', res.body.message)
+
   res = await request('PUT', '/books/1/', {
-    title: 'The Alchemist - 25th Anniversary',
+    title: 'The Alchemist - 25th Anniversary Edition',
     author: 'Paulo Coelho',
     price: 399,
     pages: 208,
   })
-  console.log('11. PUT /books/1/ (Update 200): Status', res.status, '| Message:', res.body.message)
+  console.log('PUT /books/1/: Status', res.status, '| Message:', res.body.message)
 
-  // 12. PUT /books/999/ (Update 404)
   res = await request('PUT', '/books/999/', {
-    title: 'Missing',
-    author: 'Ghost',
+    title: 'Ghost',
+    author: 'Unknown',
     price: 100,
   })
-  console.log('12. PUT /books/999/ (Update 404): Status', res.status, '| Message:', res.body.message)
+  console.log('PUT /books/999/: Status', res.status, '| Message:', res.body.message)
 
-  // 13. DELETE /books/8/ (Delete Success)
-  res = await request('DELETE', '/books/8/')
-  console.log('13. DELETE /books/8/ (Delete 200): Status', res.status, '| Message:', res.body.message)
+  res = await request('DELETE', '/books/10/')
+  console.log('DELETE /books/10/: Status', res.status, '| Message:', res.body.message)
 
-  // 14. DELETE /books/999/ (Delete 404)
   res = await request('DELETE', '/books/999/')
-  console.log('14. DELETE /books/999/ (Delete 404): Status', res.status, '| Message:', res.body.message)
-
-  console.log('\n--- ALL TEST CASES EXECUTED SUCCESSFULLY ---')
+  console.log('DELETE /books/999/: Status', res.status, '| Message:', res.body.message)
 }
 
 runTests().catch(console.error)
