@@ -1,12 +1,14 @@
-| Information | Details | Additional Information |
-| :--- | :--- | :--- |
-| Student Name | MENDA LAKSHMANARAO | |
-| Student Registration Number | 252U1R5100 | Class & Section: 313 AI DE 2B |
-| Study Level : UG/PG/Doctorate | UG | Year & Term: 2 & 2 |
-| Subject Name | Backend Development Fundamentals | |
-| Teacher / Faculty Name | Mr Yugandhar Gurjalwar | |
-| Name of the Assessment | LAB REPORT - 3 | |
-| Date of Submission | 6/11/2026 | |
+| Information                   | Details                          |
+| :---------------------------- | :------------------------------- |
+| Student Name                  | MENDA LAKSHMANARAO               |
+| Student Registration Number   | 252U1R5100                       |
+| Class & Section               | 313 AI DE 2B                     |
+| Study Level : UG/PG/Doctorate | UG                               |
+| Year & Term                   | 2 & 2                            |
+| Subject Name                  | Backend Development Fundamentals |
+| Teacher / Faculty Name        | Mr Yugandhar Gurjalwar           |
+| Name of the Assessment        | LAB REPORT - 3                   |
+| Date of Submission            | 6/11/2026                        |
 
 ---
 
