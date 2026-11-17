@@ -18,13 +18,13 @@ This repository contains all laboratory exercises for the Backend Development Fu
 | [`lab-01/`](./lab-01/) | **Node.js & Express Server** | Introduction to Node.js HTTP module, Express setup, routing, and 404 handlers. | Completed |
 | [`lab-02/`](./lab-02/) | **SQLite Database & CRUD Routes** | SQLite integration with Express, table creation, and basic CRUD API routes. | Completed |
 | [`lab-03/`](./lab-03/) | **REST API, Query Parameters, Validation & Debugging** | RESTful `/books` API with `search_q` (LIKE), `order_by`, `order`, `limit`, `offset`, price filtering (`min_price`/`max_price`), body validation (400), correct HTTP status codes (200, 201, 404), and error debugging. | Completed |
+| [`lab-04/`](./lab-04/) | **Registration, Login and JWT** | User registration and login with bcrypt password hashing, JWT token generation, SQLite user storage, parameterized queries, and stateless authentication. | Completed |
 
 ---
 
-## Lab 3 Highlights
-- **RESTful Endpoints:** Proper noun naming (`/books`) and standard HTTP verbs (`GET`, `POST`, `PUT`, `DELETE`).
-- **Query Parameters:** Supports title search (`search_q`), dynamic multi-column sorting (`order_by`, `order`), price range filtering (`min_price`, `max_price`), and pagination (`limit`, `offset`).
-- **Body Validation:** Rejects invalid or missing `title`, `author`, and non-numeric `price` with `400 Bad Request` and descriptive error messages.
-- **Consistent Response Format:** Uniform JSON formatting across all success and error responses.
-- **Postman Test Suite:** Complete test collection covering success cases, edge cases, and failure scenarios.
-- **Screenshots:** Visual proof of working endpoints and database states documented in `lab-03/screenshots/`.
+## Lab 4 Highlights
+- **User Registration:** Secure signup with bcrypt password hashing and duplicate username prevention.
+- **User Login:** Credential verification using `bcrypt.compare()` with appropriate error messages for unknown users and wrong passwords.
+- **JWT Authentication:** Stateless token generation with `jsonwebtoken`, payload contains only the username.
+- **Security:** Passwords never stored in plain text, never included in JWT payloads, parameterized SQL queries for injection prevention.
+- **Screenshots:** Visual proof of working endpoints, database state, and JWT verification documented in `lab-04/screenshots/`.
